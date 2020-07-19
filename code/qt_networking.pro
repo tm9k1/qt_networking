@@ -17,4 +17,4 @@ HEADERS  += mainwindow.h \ \
 FORMS    += mainwindow.ui
 
 #Uncomment to check qDebug messages in a separate console window.
-CONFIG += console
+#CONFIG += console

@@ -48,7 +48,6 @@ QString MyServer::getPortNumber()
 
 bool MyServer::writeTCPMessage(QString &message)
 {
-    qDebug() << m_tcpSocket;
     if(m_tcpSocket) {
         m_tcpSocket->write(message.toStdString().c_str());
         return m_tcpSocket->waitForBytesWritten(30000);

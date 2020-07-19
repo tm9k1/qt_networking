@@ -72,7 +72,7 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
         connect(m_clientSocket, SIGNAL(connected()), this, SLOT(clientConnected()));
 
         m_clientSocket->connectToHost(QHostAddress(ui->clientIpLineEdit->text()),
-                               ui->clientPortLineEdit->text().toInt());
+                                      ui->clientPortLineEdit->text().toInt());
 
         if(!m_clientSocket->waitForConnected(3000)) {
             QMessageBox::critical(this, "Could not connect", "Could not connect to the given IP-port combination.");
@@ -88,7 +88,7 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
 
         } else {
             connect(m_clientSocket, SIGNAL(readyRead()), this, SLOT(readMessages()));
-            qDebug() << "Looks like Socket connected to the port.";
+            //            qDebug() << "Looks like Socket connected to the port.";
         }
         ui->connectPushButton->setEnabled(true);
 
@@ -146,7 +146,6 @@ void MainWindow::clientConnected()
 
 void MainWindow::readMessages()
 {
-    qDebug() << "readyRead was fired!!";
     qDebug() << "Attempting to read now...";
     if(m_clientSocket->isReadable()) {
         if(m_receivedMessages->count() == messagesLimit) {
@@ -164,10 +163,10 @@ void MainWindow::on_showMessagesPushButton_clicked()
 {
 
     QString string = "";
-        for(QString &temp: *m_receivedMessages) {
-            string.append(temp);
-            string.append("\n");
-        }
+    for(QString &temp: *m_receivedMessages) {
+        string.append(temp);
+        string.append("\n");
+    }
 
     if(string.isEmpty()) {
         string = "No messages yet.";
@@ -188,7 +187,7 @@ void MainWindow::on_sendTcpPushButton_clicked()
     }
 
     if(m_server->writeTCPMessage(message)) {
-                qDebug() << "Message written to socket.";
+        //                qDebug() << "Message written to socket.";
     } else {
         QMessageBox::critical(this,"Error", "Could not send the message");
     }
@@ -203,7 +202,7 @@ void MainWindow::on_sendUdpPushButton_clicked()
     QByteArray data;
     data.append(message);
     if(m_clientSocket->write(data) != -1) {
-                qDebug() << "Message sent";
+        //                qDebug() << "Message sent";
     } else {
         QMessageBox::critical(this,"Error", "Could not send the message");
     }

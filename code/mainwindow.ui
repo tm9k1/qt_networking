@@ -159,10 +159,16 @@
                <string>Connect 
 to Server</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
              <widget class="QPushButton" name="showMessagesPushButton">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -200,6 +206,9 @@ Messages</string>
          <layout class="QHBoxLayout" name="messageHorizontalLayout">
           <item>
            <widget class="QTextEdit" name="messageTextEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -216,6 +225,9 @@ Messages</string>
           </item>
           <item>
            <widget class="QPushButton" name="sendMessagePushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>

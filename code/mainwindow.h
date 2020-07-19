@@ -18,14 +18,19 @@ public:
 
 private slots:
     void on_startServerPushButton_clicked(bool checked);
+    void clientConnected();
+    void clientDisconnected();
+    void on_connectPushButton_clicked(bool checked);
+    void destroyServer();
+    void on_sendMessagePushButton_clicked();
 
-public slots:
 protected:
     void keyPressEvent(QKeyEvent *e);
 
 private:
     Ui::MainWindow *ui;
     MyServer *mServer;
+    QAbstractSocket * mSocket;
 };
 
 #endif // MAINWINDOW_H

@@ -4,28 +4,33 @@
 MyServer::MyServer(QObject *parent) : QObject(parent)
 {
     m_server = new QTcpServer(this);
-    connect(m_server,SIGNAL(newConnection()), this, SLOT(newConnection()));
-    m_server->listen(QHostAddress::Any, 1234);
-    if(m_server->isListening()) {
-        qDebug() << "Server started.";
-        m_ipAddress = m_server->serverAddress().toString();
-        m_portNumber = QString::number(m_server->serverPort());
-    } else {
-        qDebug() << "Server could not start with the given IP Address and port number.";
-    }
 }
 
 
 void MyServer::newConnection()
 {
-    QTcpSocket *socket = m_server->nextPendingConnection();
+    m_socket = m_server->nextPendingConnection();
+}
 
-    socket->write("Hello Client\r\n");
-    socket->flush();
+MyServer::~MyServer()
+{
+    m_server->close();
+    delete m_server;
+}
 
-    socket->waitForBytesWritten(3000);
+bool MyServer::startServing()
+{
+    m_server->listen(QHostAddress::Any, 1234);
+    connect(m_server,SIGNAL(newConnection()), this, SLOT(newConnection()));
 
-    socket->close();
+    if(m_server->isListening()) {
+        qDebug() << "Server started.";
+        m_ipAddress = m_server->serverAddress().toString();
+        m_portNumber = QString::number(m_server->serverPort());
+        return true;
+    } else {
+        return false;
+    }
 }
 
 QString MyServer::getIpAddress()
@@ -38,3 +43,8 @@ QString MyServer::getPortNumber()
     return m_portNumber;
 }
 
+bool MyServer::writeMessage(QString &message)
+{
+    m_socket->write(message.toStdString().c_str());
+    return m_socket->waitForBytesWritten(30000);
+}

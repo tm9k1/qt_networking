@@ -18,17 +18,15 @@ public:
 
     QString getIpAddress();
     QString getPortNumber();
-    bool writeMessage(QString &message);
-
-signals:
+    bool writeTCPMessage(QString &message);
 
 public slots:
     void newConnection();
 
-
 private:
     QTcpServer *m_server;
-    QTcpSocket *m_socket;
+    QTcpSocket *m_tcpSocket;
+    QUdpSocket *m_udpSocket;
     QString m_ipAddress;
     QString m_portNumber;
 };

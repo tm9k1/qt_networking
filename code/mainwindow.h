@@ -23,19 +23,22 @@ private slots:
     void clientConnected();
     void clientDisconnected();
     void on_connectPushButton_clicked(bool checked);
-    void on_sendMessagePushButton_clicked();
     void readMessages();
 
     void on_showMessagesPushButton_clicked();
+
+    void on_sendTcpPushButton_clicked();
+
+    void on_sendUdpPushButton_clicked();
 
 protected:
     void keyPressEvent(QKeyEvent *e);
 
 private:
     Ui::MainWindow *ui;
-    MyServer *mServer;
-    QAbstractSocket *mSocket;
-    QQueue<QString> *mMessages;
+    MyServer *m_server;
+    QAbstractSocket *m_clientSocket;
+    QQueue<QString> *m_receivedMessages;
     int messagesLimit = 10;
 
     void destroyServer();

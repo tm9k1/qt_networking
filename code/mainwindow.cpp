@@ -7,19 +7,20 @@
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow), m_server(nullptr), m_clientSocket(nullptr), m_receivedMessages(new QQueue<QString>)
 {
     ui->setupUi(this);
     this->show();
-    mServer = nullptr;
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
     destroyServer();
-    delete mSocket;
-    delete mMessages;
+    if (m_clientSocket) {
+        delete m_clientSocket;
+    }
+    delete m_receivedMessages;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -32,20 +33,21 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 void MainWindow::on_startServerPushButton_clicked(bool checked)
 {
     if (checked) {
-        qDebug() << "Creating Server";
-        mServer = new MyServer();
-        if(mServer->startServing()){
+        //        qDebug() << "Creating Server";
+        m_server = new MyServer();
+
+        if(m_server->startServing()){
+            //        qDebug() << "Server started.";
             ui->startServerPushButton->setText("Server Created\nClick to Stop");
-            ui->serverIpLabel->setText(mServer->getIpAddress());
-            ui->serverPortNumberLabel->setText(mServer->getPortNumber());
-            ui->sendMessagePushButton->setEnabled(true);
-            ui->messageTextEdit->setEnabled(true);
+            ui->serverIpLabel->setText(m_server->getIpAddress());
+            ui->serverPortNumberLabel->setText(m_server->getPortNumber());
+            ui->sendTcpPushButton->setEnabled(true);
         } else {
             QMessageBox::critical(this, "Error", "Could not start the server.\nPlease check if some other program is using that IP-port combination.");
             destroyServer();
         }
     } else {
-        if(mServer) {
+        if(m_server) {
             destroyServer();
         }
     }
@@ -58,107 +60,153 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
         ui->connectPushButton->setEnabled(false);
 
         if (ui->udpModeRadioButton->isChecked()) {
-            mSocket = new QUdpSocket(this);
+            m_clientSocket = new QUdpSocket(this);
+            m_clientSocket->bind(QHostAddress(ui->clientIpLineEdit->text()),
+                                 ui->clientPortLineEdit->text().toInt());
+            ui->sendUdpPushButton->setEnabled(true);
         } else {
-            mSocket = new QTcpSocket(this);
+            m_clientSocket = new QTcpSocket(this);
         }
 
-        connect(mSocket, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
-        connect(mSocket, SIGNAL(connected()), this, SLOT(clientConnected()));
+        connect(m_clientSocket, SIGNAL(disconnected()), this, SLOT(clientDisconnected()));
+        connect(m_clientSocket, SIGNAL(connected()), this, SLOT(clientConnected()));
 
-        mSocket->connectToHost(QHostAddress(ui->clientIpLineEdit->text()),
+        m_clientSocket->connectToHost(QHostAddress(ui->clientIpLineEdit->text()),
                                ui->clientPortLineEdit->text().toInt());
 
-        if(!mSocket->waitForConnected(3000)) {
+        if(!m_clientSocket->waitForConnected(3000)) {
             QMessageBox::critical(this, "Could not connect", "Could not connect to the given IP-port combination.");
-            if(mSocket) {
-                delete mSocket;
-                mSocket = nullptr;
+
+            if(m_clientSocket) {
+                delete m_clientSocket;
+                m_clientSocket = nullptr;
+                ui->sendUdpPushButton->setEnabled(false);
             }
+
             ui->connectPushButton->setText("Click to\nConnect");
             ui->connectPushButton->setChecked(false);
+
         } else {
-            mMessages = new QQueue<QString>();
-            connect(mSocket, SIGNAL(readyRead()), this, SLOT(readMessages()));
+            connect(m_clientSocket, SIGNAL(readyRead()), this, SLOT(readMessages()));
+            qDebug() << "Looks like Socket connected to the port.";
         }
         ui->connectPushButton->setEnabled(true);
 
     } else {
-        if(mSocket) {
-            mSocket->close();
-            delete mSocket;
+        if(m_clientSocket) {
+            m_clientSocket->close();
+            delete m_clientSocket;
+            m_clientSocket = nullptr;
+            ui->sendUdpPushButton->setEnabled(false);
+
         }
     }
 }
 
 void MainWindow::destroyServer()
 {
-    if(!mServer) {
+    if(!m_server) {
         return;
     }
-    qDebug() << "Deleting Server";
-    mServer->disconnect();
-    delete mServer;
-    mServer = nullptr;
+    //    qDebug() << "Deleting Server";
+    m_server->disconnect();
+    delete m_server;
+    m_server = nullptr;
+
     ui->startServerPushButton->setText("Create\nServer");
     ui->startServerPushButton->setChecked(false);
     ui->serverIpLabel->setText("");
     ui->serverPortNumberLabel->setText("");
-    ui->sendMessagePushButton->setEnabled(false);
-    ui->messageTextEdit->setEnabled(false);
-    ui->messageTextEdit->clear();
+    ui->sendTcpPushButton->setEnabled(false);
 }
 
 void MainWindow::clientDisconnected()
 {
-    qDebug() << "Client Disconnected";
+    //    qDebug() << "Client Disconnected.";
     ui->connectPushButton->setText("Click to\nConnect");
     ui->connectPushButton->setChecked(false);
-    ui->showMessagesPushButton->setEnabled(false);
 
+    ui->clientIpLineEdit->setEnabled(true);
+    ui->clientPortLineEdit->setEnabled(true);
+    ui->udpModeRadioButton->setEnabled(true);
+    ui->tcpModeRadioButton->setEnabled(true);
 }
 
 void MainWindow::clientConnected()
 {
-    qDebug() << "Client Connected! Yayyyy!!!";
+    //    qDebug() << "Client Connected.";
     ui->connectPushButton->setText("Click to\nDisconnect");
     ui->connectPushButton->setChecked(true);
-    ui->showMessagesPushButton->setEnabled(true);
 
-}
-
-void MainWindow::on_sendMessagePushButton_clicked()
-{
-    QString message = ui->messageTextEdit->toPlainText();
-    if(mServer->writeMessage(message)) {
-        qDebug() << "Message written to socket.";
-    } else {
-        QMessageBox::critical(this,"Error", "Could not send the message to client.");
-    }
+    ui->clientIpLineEdit->setEnabled(false);
+    ui->clientPortLineEdit->setEnabled(false);
+    ui->udpModeRadioButton->setEnabled(false);
+    ui->tcpModeRadioButton->setEnabled(false);
 }
 
 void MainWindow::readMessages()
 {
-    if(mSocket->isReadable()) {
-        if(mMessages->count() == messagesLimit) {
-            mMessages->dequeue();
+    qDebug() << "readyRead was fired!!";
+    qDebug() << "Attempting to read now...";
+    if(m_clientSocket->isReadable()) {
+        if(m_receivedMessages->count() == messagesLimit) {
+            m_receivedMessages->dequeue();
         }
-        mMessages->enqueue(mSocket->readAll());
+
+        m_receivedMessages->enqueue(m_clientSocket->readAll());
+
     } else {
-        qDebug() << "Could not read the message.";
+        //        qDebug() << "Could not read the message from socket.";
     }
 }
 
 void MainWindow::on_showMessagesPushButton_clicked()
 {
+
     QString string = "";
-    for(QString &temp: *mMessages) {
-        string.append(temp);
-        string.append("\n");
+        for(QString &temp: *m_receivedMessages) {
+            string.append(temp);
+            string.append("\n");
+        }
+
+    if(string.isEmpty()) {
+        string = "No messages yet.";
     }
+
     QMessageBox(QMessageBox::Information,
-                QString("Last %1 messages").arg(qMin(mMessages->count(),messagesLimit)),
+                QString("Last %1 messages").arg(qMin(m_receivedMessages->count(),messagesLimit)),
                 string,
                 QMessageBox::Ok,
                 this).exec();
 }
+
+void MainWindow::on_sendTcpPushButton_clicked()
+{
+    QString message = ui->messageTextEdit->toPlainText();
+    if(message.isEmpty()) {
+        return;
+    }
+
+    if(m_server->writeTCPMessage(message)) {
+                qDebug() << "Message written to socket.";
+    } else {
+        QMessageBox::critical(this,"Error", "Could not send the message");
+    }
+}
+
+void MainWindow::on_sendUdpPushButton_clicked()
+{
+    QString message = ui->messageTextEdit->toPlainText();
+    if(message.isEmpty()) {
+        return;
+    }
+    QByteArray data;
+    data.append(message);
+    if(m_clientSocket->write(data) != -1) {
+                qDebug() << "Message sent";
+    } else {
+        QMessageBox::critical(this,"Error", "Could not send the message");
+    }
+
+}
+

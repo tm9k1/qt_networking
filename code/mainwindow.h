@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QQueue>
+
 #include <myserver.h>
 
 namespace Ui {
@@ -21,8 +23,10 @@ private slots:
     void clientConnected();
     void clientDisconnected();
     void on_connectPushButton_clicked(bool checked);
-    void destroyServer();
     void on_sendMessagePushButton_clicked();
+    void readMessages();
+
+    void on_showMessagesPushButton_clicked();
 
 protected:
     void keyPressEvent(QKeyEvent *e);
@@ -30,7 +34,12 @@ protected:
 private:
     Ui::MainWindow *ui;
     MyServer *mServer;
-    QAbstractSocket * mSocket;
+    QAbstractSocket *mSocket;
+    QQueue<QString> *mMessages;
+    int messagesLimit = 10;
+
+    void destroyServer();
+
 };
 
 #endif // MAINWINDOW_H

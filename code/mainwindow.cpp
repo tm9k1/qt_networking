@@ -18,6 +18,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
     destroyServer();
+    delete mSocket;
+    delete mMessages;
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *e)
@@ -73,11 +75,11 @@ void MainWindow::on_connectPushButton_clicked(bool checked)
                 delete mSocket;
                 mSocket = nullptr;
             }
-
             ui->connectPushButton->setText("Click to\nConnect");
             ui->connectPushButton->setChecked(false);
         } else {
-            ui->showMessagesPushButton->setEnabled(true);
+            mMessages = new QQueue<QString>();
+            connect(mSocket, SIGNAL(readyRead()), this, SLOT(readMessages()));
         }
         ui->connectPushButton->setEnabled(true);
 
@@ -104,6 +106,7 @@ void MainWindow::destroyServer()
     ui->serverPortNumberLabel->setText("");
     ui->sendMessagePushButton->setEnabled(false);
     ui->messageTextEdit->setEnabled(false);
+    ui->messageTextEdit->clear();
 }
 
 void MainWindow::clientDisconnected()
@@ -111,6 +114,8 @@ void MainWindow::clientDisconnected()
     qDebug() << "Client Disconnected";
     ui->connectPushButton->setText("Click to\nConnect");
     ui->connectPushButton->setChecked(false);
+    ui->showMessagesPushButton->setEnabled(false);
+
 }
 
 void MainWindow::clientConnected()
@@ -118,6 +123,7 @@ void MainWindow::clientConnected()
     qDebug() << "Client Connected! Yayyyy!!!";
     ui->connectPushButton->setText("Click to\nDisconnect");
     ui->connectPushButton->setChecked(true);
+    ui->showMessagesPushButton->setEnabled(true);
 
 }
 
@@ -129,4 +135,30 @@ void MainWindow::on_sendMessagePushButton_clicked()
     } else {
         QMessageBox::critical(this,"Error", "Could not send the message to client.");
     }
+}
+
+void MainWindow::readMessages()
+{
+    if(mSocket->isReadable()) {
+        if(mMessages->count() == messagesLimit) {
+            mMessages->dequeue();
+        }
+        mMessages->enqueue(mSocket->readAll());
+    } else {
+        qDebug() << "Could not read the message.";
+    }
+}
+
+void MainWindow::on_showMessagesPushButton_clicked()
+{
+    QString string = "";
+    for(QString &temp: *mMessages) {
+        string.append(temp);
+        string.append("\n");
+    }
+    QMessageBox(QMessageBox::Information,
+                QString("Last %1 messages").arg(qMin(mMessages->count(),messagesLimit)),
+                string,
+                QMessageBox::Ok,
+                this).exec();
 }

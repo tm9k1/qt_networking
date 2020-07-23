@@ -165,7 +165,7 @@ void MainWindow::clientDisconnected()
 
 void MainWindow::clientConnected()
 {
-    qDebug() << "Client Connected.";
+    //    qDebug() << "Client Connected.";
     ui->connectPushButton->setText("Click to\nDisconnect");
     ui->connectPushButton->setChecked(true);
 

@@ -157,8 +157,8 @@ void MainWindow::clientDisconnected()
     ui->tcpModeRadioButton->setEnabled(true);
 
     // disable message box
-    ui->sendMessagePushButton->setEnabled(true);
-    ui->messageTextEdit->setEnabled(true);
+    ui->sendMessagePushButton->setEnabled(false);
+    ui->messageTextEdit->setEnabled(false);
 }
 
 void MainWindow::clientConnected()

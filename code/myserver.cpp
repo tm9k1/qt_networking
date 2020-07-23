@@ -54,7 +54,8 @@ void MyServer::readMessage()
     while (m_tcpSocket->bytesAvailable()) {
         m_receivedMessages->append(Message(m_tcpSocket->readAll(),
                                            m_tcpSocket->localAddress().toString(),
-                                           QString::number(m_tcpSocket->localPort())));
+                                           QString::number(m_tcpSocket->localPort()),
+                                           "TCP"));
     }
 
     while (m_udpSocket->hasPendingDatagrams()) {
@@ -72,7 +73,8 @@ void MyServer::readMessage()
 
         m_receivedMessages->append(Message(buf,
                                        srcHost->toString(),
-                                       QString::number(*srcPort)));
+                                       QString::number(*srcPort),
+                                           "UDP"));
     }
 }
 
@@ -85,10 +87,11 @@ QPair<QString, int> MyServer::getMessages(int reqCount)
     it = m_receivedMessages->rbegin();
     for(int i = 0; i < actualCount; ++i,*it++) {
         QString message = "";
-        message.append(QString("<p align = \"center\"><b>From: </b> %1:%2<br/>"
-                               "<b>Message Contents</b></p>%3\n")
+        message.append(QString("<p align = \"center\"><b>From: </b> %1:%2 | <b>Protocol : </b>%3<br/>"
+                               "<b>Message Contents</b></p>%4\n")
                        .arg((*it).srcHost)
                        .arg((*it).srcPort)
+                       .arg((*it).protocol)
                        .arg((*it).message));
 
         if(i != actualCount-1) {

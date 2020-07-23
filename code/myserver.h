@@ -13,8 +13,8 @@ struct Message {
     QString srcHost;
     QString srcPort;
     QString protocol;
-    Message(QString msg, QString sourceHost, QString sourcePort) :
-        message(msg), srcHost(sourceHost), srcPort(sourcePort) {}
+    Message(QString msg, QString sourceHost, QString sourcePort, QString proto) :
+        message(msg), srcHost(sourceHost), srcPort(sourcePort), protocol(proto) {}
 };
 
 class MyServer : public QObject

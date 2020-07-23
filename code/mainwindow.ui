@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>321</height>
+    <height>300</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -55,6 +55,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="placeholderText">
+                 <string>Server's IP Address</string>
+                </property>
                </widget>
               </item>
               <item alignment="Qt::AlignHCenter">
@@ -97,6 +100,12 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>Server's Port No.</string>
+                </property>
                </widget>
               </item>
              </layout>
@@ -112,7 +121,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>TCP Mode Connection</string>
+                 <string>TCP Mode</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -128,7 +137,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>UDP Mode Connection</string>
+                 <string>UDP Mode</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
@@ -164,16 +173,40 @@ Connect</string>
               </property>
              </widget>
             </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="messageHorizontalLayout">
+          <item>
+           <widget class="QTextEdit" name="messageTextEdit">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="placeholderText">
+             <string>Type a message</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QPushButton" name="showMessagesPushButton">
+             <widget class="QPushButton" name="sendMessagePushButton">
               <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+               <bool>false</bool>
               </property>
               <property name="minimumSize">
                <size>
@@ -182,8 +215,8 @@ Connect</string>
                </size>
               </property>
               <property name="text">
-               <string>Show Last 10
-Messages</string>
+               <string>Send
+Message</string>
               </property>
              </widget>
             </item>
@@ -202,55 +235,6 @@ Messages</string>
       </item>
       <item>
        <layout class="QVBoxLayout" name="serverVerticalLayout">
-        <item>
-         <layout class="QHBoxLayout" name="messageHorizontalLayout">
-          <item>
-           <widget class="QTextEdit" name="messageTextEdit">
-            <property name="enabled">
-             <bool>true</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QPushButton" name="sendTcpPushButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Send as
-TCP Message</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="sendUdpPushButton">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Send as
-UDP Message</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
         <item>
          <layout class="QHBoxLayout" name="startServerHorizontalLayout">
           <item>
@@ -277,7 +261,10 @@ Server</string>
            </widget>
           </item>
           <item alignment="Qt::AlignRight">
-           <widget class="QLabel" name="label_5">
+           <widget class="QLabel" name="ipAddressLabel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -322,7 +309,10 @@ Server</string>
            </widget>
           </item>
           <item alignment="Qt::AlignRight">
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="portNumberLabel">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -335,7 +325,7 @@ Server</string>
            </widget>
           </item>
           <item alignment="Qt::AlignLeft">
-           <widget class="QLabel" name="serverPortNumberLabel">
+           <widget class="QLabel" name="serverPortLabel">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -356,6 +346,29 @@ Server</string>
             </property>
             <property name="textInteractionFlags">
              <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="showMessagesPushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Show Last 10
+Messages</string>
             </property>
            </widget>
           </item>

@@ -6,13 +6,16 @@ A Qt project that supports listening to messages over socket.
 
 ## Features
 
-- The IP Address and Port Number are runtime input from the user.
-- You can view the last 10 messages in a QMessageBox.
-- Supports both TCP and UDP socket which are selectable by the user from the GUI itself.
-- Also contains functionality to create a server.
-    - The message to send is an input from a textEdit box.
+- The IP Address and Port Number are runtime input from the user. Send messages to any IP-port combination.
+    - The message to send is an input from a `textEdit` box.
+- Supports both TCP and UDP communications.
+
+- Also contains functionality to create a Server.
+    - Listens to both UDP messages as well as TCP message simultaneously. (priority to TCP - keeps reading while `bytesAvailable`)
+    - You can view the last 10 messages sent to the server in a `QMessageBox`.
 
 - UI/UX is bae.
+
 - WYSIWYG - check out the Gallery to see what it does. 
 
 ## How To Run
@@ -23,7 +26,7 @@ A Qt project that supports listening to messages over socket.
 ## TODO
 - The UDP connection happens over a single QUdpSocket right now. Need to look into improving the implementation with two sockets instead of just one.
 
-## Gallery
+## Gallery (to be updated)
 
 ![1](gallery/1.png)
 
@@ -38,5 +41,7 @@ A Qt project that supports listening to messages over socket.
 ![1](gallery/6.png)
 
 ![1](gallery/7.png)
+
+![1](gallery/8.png)
 
 

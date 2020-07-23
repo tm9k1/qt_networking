@@ -137,8 +137,9 @@ void MainWindow::on_showMessagesPushButton_clicked()
     QPair<QString, int> messages;
     messages = m_server->getMessages(10);
 
+    QString s = (messages.second > 1) ? "s" : "";
     QMessageBox(QMessageBox::NoIcon,
-                QString("Last %1 messages").arg(messages.second),
+                QString("Last %1 message"+s).arg(messages.second),
                 messages.first,
                 QMessageBox::Ok,
                 this).exec();

@@ -42,6 +42,7 @@ void MainWindow::on_startServerPushButton_clicked(bool checked)
             delete m_server;
             m_server = nullptr;
             ui->startServerPushButton->setChecked(false);
+            checked = false;
         }
     } else {
         if(m_server) {
